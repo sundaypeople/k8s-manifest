@@ -1,0 +1,13 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: argocd
+  namespace: argocd
+spec:
+  source:
+    repoURL: https://github.com/sundaypeople/k8s-manifest
+    targetRevision: HEAD
+    path: argocd/
+  destination:
+    server: 'https://kubernetes.default.svc'
+    namespace: target-namespace

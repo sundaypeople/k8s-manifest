@@ -1,0 +1,7 @@
+
+helmCharts:
+  - name: opentelemetry
+    repo: https://github.com/open-telemetry/opentelemetry-helm-charts/tree/main/charts/opentelemetry-collector
+    version: 0.157.0
+    releaseName: opentelemetry
+    namespace: opentelemetry
