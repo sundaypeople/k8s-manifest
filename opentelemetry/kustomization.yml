@@ -5,3 +5,6 @@ helmCharts:
     version: 0.157.0
     releaseName: opentelemetry
     namespace: opentelemetry
+    valuesInline:
+      image:
+        repository: otel/opentelemetry-collector-k8s
