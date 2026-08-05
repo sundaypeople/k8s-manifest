@@ -1,0 +1,13 @@
+mode: daemonset
+image:
+  repository: "otel/opentelemetry-collector-k8s"
+presets:
+  hostMetrics:
+    enabled: true
+  kubernetesAttributes:
+    enabled: false
+  kubeletMetrics:
+      enabled: false
+config:
+  exporters:
+    debug: {}
