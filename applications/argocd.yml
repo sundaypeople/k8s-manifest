@@ -4,6 +4,7 @@ metadata:
   name: argocd
   namespace: argocd
 spec:
+  project: default
   source:
     repoURL: https://github.com/sundaypeople/k8s-manifest
     targetRevision: HEAD
