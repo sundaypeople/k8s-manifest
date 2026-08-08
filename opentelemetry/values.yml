@@ -8,6 +8,37 @@ presets:
     enabled: false
   kubeletMetrics:
       enabled: false
+
+extraEnvsFrom:
+  - secretRef:
+      name: ms-token
+
+
 config:
+  receivers:
+    # データソース: メトリクス
+    host_metrics:
+      scrapers:
+        cpu:
+        disk:
+        filesystem:
+        load:
+        memory:
+        network:
+        process:
+        processes:
+        paging:
+
   exporters:
-    debug: {}
+    debug:
+      verbosity: detailed
+    prometheusremotewrite:
+      endpoint: "https://113801781482.metrics.monitoring.global.api.sacloud.jp/prometheus/api/v1/write"
+      headers:
+        Authorization: "Bearer ${TOKEN}" # 環境変数を使用
+
+  service:
+    pipelines:
+      metrics:
+        receivers: [  host_metrics ]
+        exporters: [  prometheusremotewrite ]
