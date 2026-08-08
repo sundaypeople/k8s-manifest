@@ -1,4 +1,7 @@
 mode: daemonset
+serviceAccount:
+  name: "collector"
+  create: false
 image:
   repository: "otel/opentelemetry-collector-contrib"
 presets:
@@ -25,6 +28,26 @@ config:
         load:
         memory:
         network:
+    prometheus:
+      config:
+        scrape_configs:
+          - job_name: 'knative'
+            scrape_interval: 30s
+            kubernetes_sd_configs:
+              - role: pod
+                namespaces:
+                  names:
+                    - knative-serving
+            relabel_configs:
+              - action: labelmap
+                regex: __meta_kubernetes_pod_label_(.+)
+              - source_labels: [ __meta_kubernetes_namespace ]
+                action: replace
+                target_label: namespace
+              - source_labels: [ __meta_kubernetes_pod_name ]
+                action: replace
+                target_label: pod
+
 
   exporters:
     debug:
@@ -37,5 +60,5 @@ config:
   service:
     pipelines:
       metrics:
-        receivers: [  host_metrics ]
+        receivers: [  host_metrics,prometheus ]
         exporters: [  prometheusremotewrite ]
