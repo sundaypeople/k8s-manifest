@@ -4,6 +4,7 @@ serviceAccount:
   create: false
 image:
   repository: "soyokaze0125/my-otel-collector"
+  pullPolicy: Always
 presets:
   logsCollection:
     enabled: false
