@@ -4,7 +4,17 @@ serviceAccount:
   create: false
 image:
   repository: "soyokaze0125/my-otel-collector"
-
+presets:
+  logsCollection:
+    enabled: false
+  hostMetrics:
+    enabled: false
+  kubernetesAttributes:
+    enabled: false
+  kubeletMetrics:
+    enabled: false
+  clusterMetrics:
+    enabled: false
 extraEnvsFrom:
   - secretRef:
       name: ms-token
@@ -44,40 +54,40 @@ config:
               - source_labels: [ __name__ ]
                 regex: http_client_request_duration_seconds_.*
                 action: keep
-    processors:
+  processors:
 
-      # ★ 1. 先に高カーディナリティなラベルを削除する
-      # （これでインスタンス等の違いが消え、同じサービスのデータ同士が自動合算される）
-      transform:
-        metric_statements:
-          - context: metric
-            statements:
-              # "old_metric_name" を "new_metric_name" に変更する
-              - set(name, "delta_http_client_request_duration_seconds") where name == "http_client_request_duration_seconds"
-          - context: datapoint
-            statements:
-              - delete_key(attributes, "instance")
-              - delete_key(attributes, "pod_template_hash")
-              - delete_key(attributes, "server_address")
-              - delete_key(attributes, "server_port")
-              - delete_key(attributes, "timestamp")
+    # ★ 1. 先に高カーディナリティなラベルを削除する
+    # （これでインスタンス等の違いが消え、同じサービスのデータ同士が自動合算される）
+    transform:
+      metric_statements:
+        - context: metric
+          statements:
+            # "old_metric_name" を "new_metric_name" に変更する
+            - set(name, "delta_http_client_request_duration_seconds") where name == "http_client_request_duration_seconds"
+        - context: datapoint
+          statements:
+            - delete_key(attributes, "instance")
+            - delete_key(attributes, "pod_template_hash")
+            - delete_key(attributes, "server_address")
+            - delete_key(attributes, "server_port")
+            - delete_key(attributes, "timestamp")
 
-      # ★ 2. ラベルが消えて合算されたデータに対して、自作のZigZagで再起動スパイクを防止
-      zigzag:
+    # ★ 2. ラベルが消えて合算されたデータに対して、自作のZigZagで再起動スパイクを防止
+    zigzag:
 
-      batch:
-        timeout: 10s
-        send_batch_size: 1024
+    batch:
+      timeout: 10s
+      send_batch_size: 1024
 
-    exporters:
-      prometheusremotewrite:
-        endpoint: "https://113801781482.metrics.monitoring.global.api.sacloud.jp/prometheus/api/v1/write"
-        headers:
-          Authorization: "Bearer ${TOKEN}"
+  exporters:
+    prometheusremotewrite:
+      endpoint: "https://113801781482.metrics.monitoring.global.api.sacloud.jp/prometheus/api/v1/write"
+      headers:
+        Authorization: "Bearer ${TOKEN}"
 
-    service:
-      pipelines:
-        metrics:
-          receivers: [prometheus]
-          processors: [transform, zigzag, batch]
-          exporters: [prometheusremotewrite]
+  service:
+    pipelines:
+      metrics:
+        receivers: [prometheus]
+        processors: [transform, zigzag, batch]
+        exporters: [prometheusremotewrite]
