@@ -46,7 +46,7 @@ config:
                 action: keep
   processors:
     # 1. まず累積カウンターを差分（Delta）に変換し、状態を管理する
-#    cumulativetodelta:
+    cumulativetodelta:
 
     # 2. 差分（Delta）になった状態でラベルを削除し、合算する
     transform:
@@ -78,5 +78,5 @@ config:
     pipelines:
       metrics:
         receivers: [ prometheus ]
-        processors: [transform]
+        processors: [cumulativetodelta,transform]
         exporters: [  prometheusremotewrite,debug ]
