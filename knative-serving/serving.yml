@@ -9,6 +9,11 @@ metadata:
   name: knative-serving
   namespace: knative-serving
 spec:
+  workloads:
+    - name: activator
+      replicas: 2
+    - name: net-kourier-controller
+      replicas: 2
   ingress:
     kourier:
       enabled: true
