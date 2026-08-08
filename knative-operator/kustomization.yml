@@ -1,0 +1,9 @@
+resources:
+  - namespace.yml
+
+helmCharts:
+  - name: knative-operator
+    repo: https://knative.github.io/operator
+    version: v1.22.3
+    releaseName: knative-operator
+    namespace: knative-operator
