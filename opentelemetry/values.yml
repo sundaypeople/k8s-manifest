@@ -1,6 +1,6 @@
 mode: daemonset
 image:
-  repository: "otel/opentelemetry-collector-k8s"
+  repository: "otel/opentelemetry-collector-contrib"
 presets:
   hostMetrics:
     enabled: true
