@@ -8,3 +8,13 @@ kind: KnativeServing
 metadata:
   name: knative-serving
   namespace: knative-serving
+spec:
+  ingress:
+    kourier:
+      enabled: true
+      http-port: 30080
+      service-type: NodePort
+  config:
+    network:
+      ingress-class: "kourier.ingress.networking.knative.dev"
+
