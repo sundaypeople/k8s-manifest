@@ -17,6 +17,7 @@ spec:
   config:
     network:
       ingress-class: "kourier.ingress.networking.knative.dev"
+      domain-template: "{{.Name}}-{{.Namespace}}.{{.Domain}}"
     domain:
       knative.qpid.jp: ""
 
