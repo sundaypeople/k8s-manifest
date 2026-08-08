@@ -91,4 +91,4 @@ config:
       metrics:
         receivers: [prometheus]
         processors: [transform, zigzag, batch]
-        exporters: [prometheusremotewrite]
+        exporters: [prometheusremotewrite,debug]
