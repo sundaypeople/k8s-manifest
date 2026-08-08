@@ -81,6 +81,8 @@ config:
       send_batch_size: 1024
 
   exporters:
+    debug:
+      verbosity: detailed
     prometheusremotewrite:
       endpoint: "https://113801781482.metrics.monitoring.global.api.sacloud.jp/prometheus/api/v1/write"
       headers:
