@@ -54,7 +54,7 @@ config:
         - context: metric
           statements:
             # "old_metric_name" を "new_metric_name" に変更する
-            - set(name, "delta_http_client_request_duration_seconds_bucket") where name == "http_client_request_duration_seconds_bucket"
+            - set(name, "delta_http_client_request_duration_seconds") where name == "http_client_request_duration_seconds"
 #        - context: datapoint
 #          statements:
 #            - delete_key(attributes, "instance")
@@ -79,4 +79,4 @@ config:
       metrics:
         receivers: [ prometheus ]
         processors: [transform]
-        exporters: [  prometheusremotewrite ]
+        exporters: [  prometheusremotewrite,debug ]
