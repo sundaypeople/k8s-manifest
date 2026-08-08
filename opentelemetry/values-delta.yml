@@ -37,13 +37,16 @@ config:
             relabel_configs:
               - action: labelmap
                 regex: __meta_kubernetes_pod_label_(.+)
+              - source_labels: [ __meta_kubernetes_pod_container_port_name ]
+                regex: metrics
+                action: keep
             metric_relabel_configs:
               - source_labels: [ __name__ ]
-                regex: http_client_request_duration_seconds_bucket
+                regex: http_client_request_duration_seconds_.*
                 action: keep
   processors:
     # 1. まず累積カウンターを差分（Delta）に変換し、状態を管理する
-    cumulativetodelta:
+#    cumulativetodelta:
 
     # 2. 差分（Delta）になった状態でラベルを削除し、合算する
     transform:
@@ -52,16 +55,16 @@ config:
           statements:
             # "old_metric_name" を "new_metric_name" に変更する
             - set(name, "delta_http_client_request_duration_seconds_bucket") where name == "http_client_request_duration_seconds_bucket"
-        - context: datapoint
-          statements:
-            - delete_key(attributes, "instance")
-            - delete_key(attributes, "pod")
-            - delete_key(attributes, "pod_template_hash")
-            - delete_key(attributes, "kn_revision_name")
-
-        - context: metric
-          statements:
-            - aggregate_on_attributes("sum") where type == "Sum"
+#        - context: datapoint
+#          statements:
+#            - delete_key(attributes, "instance")
+#            - delete_key(attributes, "pod")
+#            - delete_key(attributes, "pod_template_hash")
+#            - delete_key(attributes, "kn_revision_name")
+#
+#        - context: metric
+#          statements:
+#            - aggregate_on_attributes("sum") where type == "Sum"
 
   exporters:
     debug:
@@ -75,5 +78,5 @@ config:
     pipelines:
       metrics:
         receivers: [ prometheus ]
-        processors: [cumulativetodelta,transform]
+        processors: [transform]
         exporters: [  prometheusremotewrite ]

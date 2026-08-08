@@ -47,6 +47,9 @@ config:
               - source_labels: [ __meta_kubernetes_pod_name ]
                 action: replace
                 target_label: pod
+              - source_labels: [ __meta_kubernetes_pod_container_port_name]
+                regex: metrics
+                action: keep
 
 
   exporters:
