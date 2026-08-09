@@ -101,6 +101,10 @@ config:
       endpoint: "https://113801787278.metrics.monitoring.global.api.sacloud.jp/prometheus/api/v1/write"
       headers:
         Authorization: "Bearer ${TOKEN}"
+    prometheusremotewrite:
+      endpoint: "http://prometheus.prometheus.svc.cluster.local:9090/api/v1/write"
+      tls:
+        insecure: true
 
   service:
     telemetry:
