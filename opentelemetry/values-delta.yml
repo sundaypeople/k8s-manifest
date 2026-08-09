@@ -103,8 +103,11 @@ config:
         Authorization: "Bearer ${TOKEN}"
 
   service:
+    telemetry:
+      logs:
+        level: debug
     pipelines:
       metrics:
         receivers: [prometheus]
         processors: [ zigzag, batch]
-        exporters: [prometheusremotewrite,debug]
+        exporters: [prometheusremotewrite]
