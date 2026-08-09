@@ -14,7 +14,14 @@ data:
     # Counter
     - match: '{__name__=~".+_total"}'
       interval: 30s
-      without: [pod, instance]
+      without:
+        - pod
+        - instance
+        - k8s_pod_name
+        - k8s_pod_ip
+        - server_address
+        - server_port
+        - pod_template_hash
       outputs: [total_prometheus]
       keep_metric_names: true
       output_relabel_configs:
@@ -22,12 +29,18 @@ data:
           target_label: __name__
           regex: "(.+)"
           replacement: "vm_delta_$1"
-
-    # Classic histogram: *_bucket / *_count / *_sum
+    
     - match: '{__name__=~".+_(bucket|count|sum)"}'
       interval: 30s
       enable_windows: true
-      without: [pod, instance]
+      without:
+        - pod
+        - instance
+        - k8s_pod_name
+        - k8s_pod_ip
+        - server_address
+        - server_port
+        - pod_template_hash
       outputs: [total_prometheus]
       keep_metric_names: true
       output_relabel_configs:
