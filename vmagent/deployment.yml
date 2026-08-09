@@ -33,14 +33,14 @@ data:
     - match: '{__name__=~".+_(bucket|count|sum)"}'
       interval: 30s
       enable_windows: true
-      without:
-        - pod
-        - instance
-        - k8s_pod_name
-        - k8s_pod_ip
-        - server_address
-        - server_port
-        - pod_template_hash
+      by:
+        - job
+        - k8s_namespace_name
+        - kn_service_name
+        - kn_revision_name
+        - http_request_method
+        - http_response_status_code
+        - le
       outputs: [total_prometheus]
       keep_metric_names: true
       output_relabel_configs:
