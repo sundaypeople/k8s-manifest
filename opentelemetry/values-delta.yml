@@ -55,27 +55,29 @@ config:
               - source_labels: [ __name__ ]
                 regex: http_client_request_duration_seconds_.*
                 action: keep
-  processors:
-
-    # ★ 1. 先に高カーディナリティなラベルを削除する
-    # （これでインスタンス等の違いが消え、同じサービスのデータ同士が自動合算される）
-    transform:
-      metric_statements:
-        - context: metric
-          statements:
-            # "old_metric_name" を "new_metric_name" に変更する
-            - set(name, "delta_http_client_request_duration_seconds") where name == "http_client_request_duration_seconds"
-        - context: datapoint
-          statements:
-            - delete_key(attributes, "instance")
-            - delete_key(attributes, "pod_template_hash")
-            - delete_key(attributes, "server_address")
-            - delete_key(attributes, "server_port")
-            - delete_key(attributes, "timestamp")
 
     # ★ 2. ラベルが消えて合算されたデータに対して、自作のZigZagで再起動スパイクを防止
+  processors:
     zigzag:
-      drop_labels: ["pod", "instance"]
+      drop_labels:
+        # インフラ・Pod固有ラベル（集約対象外）
+        - "pod"
+        - "instance"
+        - "pod_template_hash"
+        - "server_address"
+        - "server_port"
+        - "kn_configuration_name"
+        - "app"
+        - "app_kubernetes_io_component"
+        - "app_kubernetes_io_name"
+        - "app_kubernetes_io_version"
+        - "otel_scope_name"
+        - "otel_scope_version"
+        - "namespace"
+        - "network_protocol_name"
+        - "network_protocol_version"
+        - "role"
+        - "url_scheme"
       output_suffix: "_materialized"
       state_expiry: 5m
 
@@ -95,5 +97,5 @@ config:
     pipelines:
       metrics:
         receivers: [prometheus]
-        processors: [transform, zigzag, batch]
+        processors: [ zigzag, batch]
         exporters: [prometheusremotewrite,debug]
