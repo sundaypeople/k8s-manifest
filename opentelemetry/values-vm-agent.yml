@@ -1,4 +1,5 @@
-mode: daemonset
+mode: deployment
+replicaCount: 1
 serviceAccount:
   name: "collector"
   create: false
@@ -15,19 +16,6 @@ presets:
 extraEnvsFrom:
   - secretRef:
       name: ms-token
-ports:
-  otlp:
-    enabled: false
-  otlp-http:
-    enabled: false
-  jaeger-compact:
-    enabled: false
-  jaeger-grpc:
-    enabled: false
-  jaeger-thrift:
-    enabled: false
-  zipkin:
-    enabled: false
 
 
 config:
@@ -52,10 +40,6 @@ config:
                   names:
                     - knative-serving
             relabel_configs:
-              - source_labels:
-                  - __meta_kubernetes_pod_node_name
-                regex: ${env:K8S_NODE_NAME}
-                action: keep
               - action: labelmap
                 regex: __meta_kubernetes_pod_label_(.+)
               - source_labels: [ __meta_kubernetes_namespace ]
