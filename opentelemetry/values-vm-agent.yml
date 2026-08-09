@@ -16,7 +16,8 @@ presets:
 extraEnvsFrom:
   - secretRef:
       name: ms-token
-
+service:
+  enabled: false
 
 config:
   receivers:
