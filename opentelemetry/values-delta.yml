@@ -75,6 +75,9 @@ config:
 
     # ★ 2. ラベルが消えて合算されたデータに対して、自作のZigZagで再起動スパイクを防止
     zigzag:
+      drop_labels: ["pod", "instance"]
+      output_suffix: "_materialized"
+      state_expiry: 5m
 
     batch:
       timeout: 10s
