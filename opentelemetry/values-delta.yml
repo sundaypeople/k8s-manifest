@@ -56,6 +56,11 @@ config:
                 regex: http_client_request_duration_seconds_.*
                 action: keep
   processors:
+    resource:
+      attributes:
+        - key: replica
+          value: ${env:HOSTNAME}
+          action: insert
 
     # ★ 1. 先に高カーディナリティなラベルを削除する
     # （これでインスタンス等の違いが消え、同じサービスのデータ同士が自動合算される）
@@ -92,5 +97,5 @@ config:
     pipelines:
       metrics:
         receivers: [prometheus]
-        processors: [transform, zigzag, batch]
+        processors: [resource,transform, zigzag, batch]
         exporters: [prometheusremotewrite,debug]
