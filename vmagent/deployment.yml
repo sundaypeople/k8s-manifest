@@ -13,7 +13,9 @@ data:
   aggr.yaml: |
     # Counter
     - match: '{__name__=~".+_total"}'
-      interval: 30s
+      interval: 1m
+      enable_windows: true
+      staleness_interval: 2m      
       without:
         - pod
         - instance
@@ -31,8 +33,9 @@ data:
           replacement: "vm_delta_$1"
     
     - match: '{__name__=~".+_(bucket|count|sum)"}'
-      interval: 30s
+      interval: 1m
       enable_windows: true
+      staleness_interval: 2m
       by:
         - job
         - k8s_namespace_name
