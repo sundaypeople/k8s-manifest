@@ -97,11 +97,11 @@ config:
   exporters:
     debug:
       verbosity: detailed
-    prometheusremotewrite:
+    prometheusremotewrite/sacloud:
       endpoint: "https://113801787278.metrics.monitoring.global.api.sacloud.jp/prometheus/api/v1/write"
       headers:
         Authorization: "Bearer ${TOKEN}"
-    prometheusremotewrite:
+    prometheusremotewrite/local:
       endpoint: "http://prometheus.prometheus.svc.cluster.local:9090/api/v1/write"
       tls:
         insecure: true
@@ -114,4 +114,4 @@ config:
       metrics:
         receivers: [prometheus]
         processors: [ zigzag, batch]
-        exporters: [prometheusremotewrite]
+        exporters: [prometheusremotewrite/local, prometheusremotewrite/sacloud]
