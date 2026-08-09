@@ -17,3 +17,10 @@ helmCharts:
     releaseName: opentelemetry-delta
     namespace: opentelemetry
     valuesFile: values-delta.yml
+
+  - name: opentelemetry-collector
+    repo: https://open-telemetry.github.io/opentelemetry-helm-charts
+    version: 0.157.0
+    releaseName: opentelemetry-vm-agent
+    namespace: opentelemetry
+    valuesFile: values-vm-agent.yml

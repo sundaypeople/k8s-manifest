@@ -1,0 +1,95 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: vmagent
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: vmagent-stream-aggr
+  namespace: vmagent
+data:
+  aggr.yaml: |
+    # Counter
+    - match: '{__name__=~".+_total"}'
+      interval: 30s
+      without: [pod, instance]
+      outputs: [total_prometheus]
+      keep_metric_names: true
+      output_relabel_configs:
+        - source_labels: [__name__]
+          target_label: __name__
+          regex: "(.+)"
+          replacement: "vm_delta_$1"
+
+    # Classic histogram: *_bucket / *_count / *_sum
+    - match: '{__name__=~".+_(bucket|count|sum)"}'
+      interval: 30s
+      enable_windows: true
+      without: [pod, instance]
+      outputs: [total_prometheus]
+      keep_metric_names: true
+      output_relabel_configs:
+        - source_labels: [__name__]
+          target_label: __name__
+          regex: "(.+)"
+          replacement: "vm_delta_$1"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vmagent
+  namespace: vmagent
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: vmagent
+  template:
+    metadata:
+      labels:
+        app: vmagent
+    spec:
+      containers:
+        - name: vmagent
+          image: victoriametrics/vmagent:v1.148.0
+          args:
+            - -remoteWrite.url=https://113801781482.metrics.monitoring.global.api.sacloud.jp/prometheus/api/v1/write
+            - -remoteWrite.bearerTokenFile=/etc/vmagent-secret/token
+            - -streamAggr.config=/etc/vmagent/aggr.yaml
+            - -httpListenAddr=:8429
+            - -remoteWrite.tmpDataPath=/tmp/vmagent-remotewrite-data
+          ports:
+            - name: http
+              containerPort: 8429
+          volumeMounts:
+            - name: stream-aggr
+              mountPath: /etc/vmagent
+              readOnly: true
+            - name: remote-write-token
+              mountPath: /etc/vmagent-secret
+              readOnly: true
+      volumes:
+        - name: stream-aggr
+          configMap:
+            name: vmagent-stream-aggr
+        - name: remote-write-token
+          secret:
+            secretName: ms-token
+            items:
+              - key: TOKEN
+                path: token
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: vmagent
+  namespace: vmagent
+spec:
+  selector:
+    app: vmagent
+  ports:
+    - name: http
+      port: 8429
+      targetPort: http

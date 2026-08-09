@@ -1,0 +1,82 @@
+mode: daemonset
+serviceAccount:
+  name: "collector"
+  create: false
+image:
+  repository: "otel/opentelemetry-collector-contrib"
+presets:
+  hostMetrics:
+    enabled: true
+  kubernetesAttributes:
+    enabled: false
+  kubeletMetrics:
+    enabled: false
+
+extraEnvsFrom:
+  - secretRef:
+      name: ms-token
+ports:
+  otlp:
+    enabled: false
+  otlp-http:
+    enabled: false
+  jaeger-compact:
+    enabled: false
+  jaeger-grpc:
+    enabled: false
+  jaeger-thrift:
+    enabled: false
+  zipkin:
+    enabled: false
+
+
+config:
+  receivers:
+    # データソース: メトリクス
+    host_metrics:
+      scrapers:
+        cpu:
+        disk:
+        filesystem:
+        load:
+        memory:
+        network:
+    prometheus:
+      config:
+        scrape_configs:
+          - job_name: 'knative'
+            scrape_interval: 30s
+            kubernetes_sd_configs:
+              - role: pod
+                namespaces:
+                  names:
+                    - knative-serving
+            relabel_configs:
+              - action: labelmap
+                regex: __meta_kubernetes_pod_label_(.+)
+              - source_labels: [ __meta_kubernetes_namespace ]
+                action: replace
+                target_label: namespace
+              - source_labels: [ __meta_kubernetes_pod_name ]
+                action: replace
+                target_label: pod
+              - source_labels: [ __meta_kubernetes_pod_container_port_name]
+                regex: metrics
+                action: keep
+            metric_relabel_configs:
+              - source_labels: [ __name__ ]
+                regex: http_client_request_duration_seconds_.*
+                action: keep
+
+
+  exporters:
+    debug:
+      verbosity: detailed
+    prometheusremotewrite:
+      endpoint: "http://vmagent.vmagent.svc.cluster.local:8429/api/v1/write"
+
+  service:
+    pipelines:
+      metrics:
+        receivers: [  host_metrics,prometheus ]
+        exporters: [  prometheusremotewrite ]
