@@ -36,14 +36,24 @@ data:
       interval: 1m
       enable_windows: true
       staleness_interval: 2m
-      by:
-        - job
-        - k8s_namespace_name
-        - kn_service_name
-        - kn_revision_name
-        - http_request_method
-        - http_response_status_code
-        - le
+      without:
+        - pod
+        - instance
+        - pod_template_hash
+        - server_address
+        - server_port
+        - kn_configuration_name
+        - app
+        - app_kubernetes_io_component
+        - app_kubernetes_io_name
+        - app_kubernetes_io_version
+        - otel_scope_name
+        - otel_scope_version
+        - namespace
+        - network_protocol_name
+        - network_protocol_version
+        - role
+        - url_scheme
       outputs: [total_prometheus]
       keep_metric_names: true
       output_relabel_configs:
