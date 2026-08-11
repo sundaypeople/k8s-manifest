@@ -60,21 +60,12 @@ config:
   processors:
     zigzag:
       drop_labels:
+        # インフラ・Pod固有ラベル（集約対象外）
         - "pod"
         - "instance"
         - "pod_template_hash"
-
-        - "k8s_container_name"
-        - "k8s_node_name"
-        - "k8s_pod_name"
-        - "k8s_pod_uid"
-        - "k8s_replicaset_name"
-
-        - "service_instance_id"
-
         - "server_address"
         - "server_port"
-
         - "kn_configuration_name"
         - "app"
         - "app_kubernetes_io_component"
