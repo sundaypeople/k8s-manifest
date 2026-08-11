@@ -60,7 +60,7 @@ config:
   processors:
     zigzag:
       drop_labels:
-        # インフラ・Pod固有ラベル（集約対象外）
+        # 元 Prometheus labels
         - "pod"
         - "instance"
         - "pod_template_hash"
@@ -78,6 +78,32 @@ config:
         - "network_protocol_version"
         - "role"
         - "url_scheme"
+
+        # Resource Attributes が merge されるので追加で落とす
+        - "k8s.container.name"
+        - "k8s.namespace.name"
+        - "k8s.node.name"
+        - "k8s.pod.name"
+        - "k8s.pod.uid"
+        - "k8s.replicaset.name"
+
+        - "service.instance.id"
+        - "service.name"
+        - "service.version"
+
+        - "server.address"
+        - "server.port"
+        - "url.scheme"
+
+        # 念のため underscore 版も
+        - "k8s_container_name"
+        - "k8s_node_name"
+        - "k8s_pod_name"
+        - "k8s_pod_uid"
+        - "k8s_replicaset_name"
+        - "service_instance_id"
+        - "service_name"
+        - "service_version"
       output_suffix: "_materialized"
       state_expiry: 5m
 
