@@ -60,12 +60,26 @@ config:
   processors:
     zigzag:
       drop_labels:
-        # インフラ・Pod固有ラベル（集約対象外）
+        # Prometheus receiver由来の可能性があるもの
         - "pod"
         - "instance"
         - "pod_template_hash"
-        - "server_address"
-        - "server_port"
+
+        # OTel Resource Attributes
+        - "k8s.container.name"
+        - "k8s.node.name"
+        - "k8s.pod.name"
+        - "k8s.pod.uid"
+        - "k8s.replicaset.name"
+
+        - "service.instance.id"
+        - "service.name"
+
+        - "server.address"
+        - "server.port"
+        - "url.scheme"
+
+        # 元々のPrometheusラベル
         - "kn_configuration_name"
         - "app"
         - "app_kubernetes_io_component"
@@ -77,7 +91,6 @@ config:
         - "network_protocol_name"
         - "network_protocol_version"
         - "role"
-        - "url_scheme"
       output_suffix: "_materialized"
       state_expiry: 5m
 
